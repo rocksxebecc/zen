@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zenspace — Zenlab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css"/>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #111113;
+      --surface-2: #18181c;
+      --surface-3: #1e1e24;
+      --surface-4: #26262e;
+      --border: rgba(255,255,255,.07);
+      --border-2: rgba(255,255,255,.12);
+      --ink: #f0f0f4;
+      --ink-2: #a8a8b8;
+      --ink-3: #6a6a80;
+      --ink-4: #3a3a4a;
+      --accent: #6d6df6;
+      --accent-2: #9898f8;
+      --accent-glow: rgba(109,109,246,.25);
+      --green: #22d37a;
+      --green-dim: rgba(34,211,122,.12);
+      --amber: #f0a020;
+      --amber-dim: rgba(240,160,32,.12);
+      --red: #f05060;
+      --red-dim: rgba(240,80,96,.12);
+      --blue: #38bdf8;
+      --blue-dim: rgba(56,189,248,.12);
+      --violet: #a78bfa;
+      --violet-dim: rgba(167,139,250,.12);
+      --font: 'Instrument Sans', system-ui, sans-serif;
+      --mono: 'DM Mono', 'Courier New', monospace;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --r: 10px;
+      --r-sm: 6px;
+      --r-lg: 16px;
+      --r-xl: 22px;
+      --shadow: 0 8px 40px rgba(0,0,0,.5);
+      --t: 160ms ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLLBAR ─────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--ink-4); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
+
+    /* ── NAVBAR ─────────────────────────────────────────── */
+    .nav {
+      height: 56px;
+      background: rgba(9,9,11,.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 1.3rem;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -.01em;
+    }
+    .nav-logo em { font-style: italic; color: var(--accent-2); }
+    .nav-badge {
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      background: var(--accent-glow);
+      border: 1px solid rgba(109,109,246,.3);
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+    .nav-spacer { flex: 1; }
+    .nav-pill {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .72rem; font-weight: 600;
+      color: var(--green);
+      background: var(--green-dim);
+      border: 1px solid rgba(34,211,122,.2);
+      padding: 4px 12px; border-radius: 99px;
+    }
+    .nav-pill .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+    .nav-user-btn {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .78rem; font-weight: 500; color: var(--ink-2);
+      background: var(--surface-2); border: 1px solid var(--border);
+      padding: 5px 12px 5px 5px; border-radius: 99px; cursor: pointer;
+      transition: var(--t);
+    }
+    .nav-user-btn:hover { border-color: var(--border-2); color: var(--ink); }
+    .nav-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--violet) 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────────────── */
+    .layout {
+      display: flex;
+      height: calc(100dvh - 56px);
+      overflow: hidden;
+    }
+
+    /* ── LEFT SIDEBAR ────────────────────────────────────── */
+    .sidebar-left {
+      width: 230px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar-section {
+      padding: 16px 12px 8px;
+    }
+    .sidebar-section-label {
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      padding: 0 8px;
+      margin-bottom: 6px;
+    }
+    .nav-link {
+      display: flex; align-items: center; gap: 9px;
+      font-size: .8rem; font-weight: 500; color: var(--ink-3);
+      padding: 7px 10px; border-radius: var(--r-sm);
+      transition: var(--t); cursor: pointer;
+      border: none; background: none;
+      width: 100%; text-align: left;
+      font-family: var(--font);
+      text-decoration: none;
+    }
+    .nav-link:hover { background: var(--surface-3); color: var(--ink-2); }
+    .nav-link.active {
+      background: var(--accent-glow);
+      color: var(--accent-2);
+      border: 1px solid rgba(109,109,246,.2);
+    }
+    .nav-link svg { width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0; }
+
+    /* History list in sidebar */
+    .hist-list { flex: 1; overflow-y: auto; padding: 0 12px 12px; }
+    .hist-item {
+      font-size: .73rem; color: var(--ink-3);
+      padding: 6px 10px; border-radius: var(--r-sm);
+      cursor: pointer; transition: var(--t);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-family: var(--font);
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .hist-item:hover { background: var(--surface-3); color: var(--ink-2); }
+    .hist-item-domain {
+      font-size: .6rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; opacity: .5; margin-right: 6px;
+    }
+
+    .sidebar-footer {
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── SUBJECT SELECTOR BAR ─────────────────────────────── */
+    .subject-bar {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .subject-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .subject-label {
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .subj-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 11px;
+      border-radius: 99px;
+      font-size: .72rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--ink-3);
+      cursor: pointer;
+      transition: var(--t);
+      white-space: nowrap;
+      font-family: var(--font);
+    }
+    .subj-pill:hover { background: var(--surface-3); color: var(--ink-2); border-color: var(--border-2); }
+    .subj-pill.active {
+      background: var(--accent-glow);
+      color: var(--accent-2);
+      border-color: rgba(109,109,246,.35);
+    }
+    .topic-row {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .topic-row.show { display: flex; }
+    .topic-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-size: .67rem;
+      font-weight: 500;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--ink-4);
+      cursor: pointer;
+      transition: var(--t);
+      white-space: nowrap;
+      font-family: var(--font);
+    }
+    .topic-pill:hover { background: var(--surface-3); color: var(--ink-2); }
+    .topic-pill.active {
+      background: var(--accent-glow);
+      color: var(--accent-2);
+      border-color: rgba(109,109,246,.25);
+    }
+
+    /* ── MAIN AREA ───────────────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── HISTORY POPOVER ─────────────────────────────────── */
+    .history-popover {
+      position: absolute;
+      top: 50px;
+      right: 20px;
+      width: 280px;
+      max-height: 380px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md, 12px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+    .history-popover.show {
+      display: flex;
+    }
+    .history-popover-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .history-popover-footer {
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── CHAT TOPBAR ─────────────────────────────────────── */
+    .chat-topbar {
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .agent-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, #6d6df6 0%, #a78bfa 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(109,109,246,.4);
+    }
+    .topbar-info h3 {
+      font-size: .85rem; font-weight: 700; color: var(--ink);
+      letter-spacing: -.01em;
+    }
+    .topbar-info p { font-size: .7rem; color: var(--ink-3); }
+    .topbar-actions { margin-left: auto; display: flex; gap: 6px; }
+    .icon-btn {
+      width: 30px; height: 30px; border-radius: var(--r-sm);
+      border: 1px solid var(--border); background: var(--surface-2);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: var(--t); color: var(--ink-3);
+    }
+    .icon-btn:hover { background: var(--surface-4); color: var(--ink); border-color: var(--border-2); }
+    .icon-btn svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8; }
+
+    /* ── MODE BAR ────────────────────────────────────────── */
+    .mode-bar {
+      padding: 8px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; gap: 4px; align-items: center; flex-shrink: 0;
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    .mode-bar::-webkit-scrollbar { display: none; }
+    .mode-btn {
+      padding: 4px 12px; border-radius: 99px;
+      font-size: .71rem; font-weight: 600; letter-spacing: .03em;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--ink-3); cursor: pointer;
+      transition: var(--t); font-family: var(--font);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .mode-btn:hover { border-color: var(--border-2); color: var(--ink-2); }
+    .mode-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(109,109,246,.4);
+    }
+
+    /* ── MESSAGES ────────────────────────────────────────── */
+    #chatMessages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Welcome state */
+    .welcome-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; flex: 1; text-align: center;
+      gap: 20px; padding: 60px 20px;
+    }
+    .welcome-orb {
+      width: 80px; height: 80px; border-radius: 24px;
+      background: linear-gradient(135deg, #6d6df6 0%, #a78bfa 60%, #38bdf8 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      box-shadow: 0 12px 48px rgba(109,109,246,.4), 0 0 0 1px rgba(109,109,246,.2);
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)}
+    }
+    .welcome-state h2 {
+      font-family: var(--serif);
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -.02em;
+    }
+    .welcome-state h2 em { font-style: italic; color: var(--accent-2); }
+    .welcome-state p { font-size: .85rem; color: var(--ink-3); max-width: 420px; line-height: 1.6; }
+    .capability-pills {
+      display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 500px;
+    }
+    .cap-pill {
+      font-size: .68rem; font-weight: 600; letter-spacing: .04em;
+      color: var(--ink-3); background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 99px;
+      padding: 3px 10px;
+    }
+
+    /* Message rows */
+    .msg-row { display: flex; gap: 12px; align-items: flex-start; animation: msg-in .2s ease; }
+    .msg-row.user { flex-direction: row-reverse; }
+    @keyframes msg-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+    .msg-av {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+    .msg-av.agent {
+      background: linear-gradient(135deg, var(--accent), var(--violet));
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(109,109,246,.3);
+    }
+    .msg-av.user { background: var(--surface-3); color: var(--ink-2); border: 1px solid var(--border); }
+    .msg-av.img-preview { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+    .msg-body { max-width: 86%; display: flex; flex-direction: column; gap: 6px; }
+    .msg-row.user .msg-body { align-items: flex-end; }
+    .msg-meta { font-size: .65rem; color: var(--ink-4); padding: 0 2px; display: flex; align-items: center; gap: 6px; }
+    .msg-bubble {
+      padding: 14px 18px;
+      border-radius: var(--r-lg);
+      font-size: .84rem; line-height: 1.7;
+      font-family: var(--font);
+    }
+    .msg-bubble.agent-bubble {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--ink);
+      border-radius: var(--r-lg) var(--r-lg) var(--r-lg) 4px;
+    }
+    .msg-bubble.user-bubble {
+      background: var(--accent);
+      color: #fff;
+      border-radius: var(--r-lg) var(--r-lg) 4px var(--r-lg);
+      box-shadow: 0 4px 16px rgba(109,109,246,.3);
+    }
+
+    /* Image preview in user bubble */
+    .user-img-preview {
+      max-width: 240px;
+      border-radius: var(--r);
+      border: 1px solid rgba(255,255,255,.15);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* Math in bubbles */
+    .msg-bubble .katex-display { margin: 14px 0; overflow-x: auto; }
+    .msg-bubble .katex { font-size: 1.05em; }
+    .msg-bubble code {
+      font-family: var(--mono); font-size: .8rem;
+      background: var(--surface-3); padding: 2px 6px;
+      border-radius: 4px; color: var(--accent-2);
+    }
+    .msg-bubble.user-bubble code { background: rgba(255,255,255,.15); color: #fff; }
+    .msg-bubble pre {
+      background: var(--surface-3); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 14px;
+      margin: 12px 0; overflow-x: auto;
+      font-family: var(--mono); font-size: .79rem; line-height: 1.6;
+      color: var(--ink-2);
+    }
+
+    /* Domain tag */
+    .domain-tag {
+      font-size: .62rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 99px;
+    }
+    .domain-calculus { background: var(--blue-dim); color: var(--blue); }
+    .domain-linalg { background: var(--violet-dim); color: var(--violet); }
+    .domain-stats { background: var(--green-dim); color: var(--green); }
+    .domain-number { background: var(--amber-dim); color: var(--amber); }
+    .domain-geometry { background: var(--red-dim); color: var(--red); }
+    .domain-algebra { background: var(--accent-glow); color: var(--accent-2); }
+    .domain-ode { background: var(--blue-dim); color: var(--blue); }
+    .domain-topology { background: var(--violet-dim); color: var(--violet); }
+    .domain-analysis { background: var(--green-dim); color: var(--green); }
+
+    /* Thinking block */
+    .think-block {
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-bottom: 2px;
+    }
+    .think-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; cursor: pointer;
+      font-size: .7rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--ink-3);
+      background: none; border: none; width: 100%; text-align: left;
+      font-family: var(--font); transition: var(--t);
+    }
+    .think-header:hover { color: var(--ink-2); }
+    .think-spinner {
+      width: 12px; height: 12px; border-radius: 50%;
+      border: 1.5px solid var(--ink-4);
+      border-top-color: var(--accent);
+      animation: spin .8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .think-chevron { margin-left: auto; font-size: 9px; transition: transform .18s; }
+    .think-header.open .think-chevron { transform: rotate(90deg); }
+    .think-body {
+      display: none; padding: 12px 14px;
+      font-size: .78rem; color: var(--ink-3); line-height: 1.7;
+      border-top: 1px solid var(--border);
+      font-family: var(--font);
+    }
+    .think-body.open { display: block; }
+
+    /* Step styling */
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--accent-glow); border: 1px solid rgba(109,109,246,.3);
+      font-size: .67rem; font-weight: 700; color: var(--accent-2);
+      margin-right: 6px; flex-shrink: 0; vertical-align: middle;
+    }
+    .answer-block {
+      margin: 14px 0 4px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(109,109,246,.08) 0%, rgba(167,139,250,.05) 100%);
+      border: 1px solid rgba(109,109,246,.2);
+      border-radius: var(--r);
+    }
+    .answer-label {
+      font-size: .67rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--accent-2); margin-bottom: 6px;
+    }
+
+    /* Typing indicator */
+    .typing-wrap {
+      padding: 12px 16px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--r-lg) var(--r-lg) var(--r-lg) 4px;
+      display: flex; align-items: center; gap: 8px;
+      width: fit-content;
+    }
+    .typing-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--ink-3); animation: bounce 1.2s ease infinite;
+    }
+    .typing-dot:nth-child(2){animation-delay:.15s}
+    .typing-dot:nth-child(3){animation-delay:.3s}
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-5px);opacity:1} }
+    .typing-label { font-size: .72rem; color: var(--ink-3); font-family: var(--font); }
+
+    /* Copy / action buttons */
+    .msg-actions { display: flex; gap: 5px; flex-wrap: wrap; padding: 2px 0; }
+    .act-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .69rem; font-weight: 600; color: var(--ink-3);
+      background: var(--surface-2); border: 1px solid var(--border);
+      padding: 3px 9px; border-radius: 99px; cursor: pointer;
+      transition: var(--t); font-family: var(--font);
+    }
+    .act-btn:hover { background: var(--surface-3); color: var(--ink); border-color: var(--border-2); }
+    .act-btn svg { width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2; }
+
+    /* Error bubble */
+    .err-bubble {
+      padding: 12px 16px;
+      background: var(--red-dim); border: 1px solid rgba(240,80,96,.25);
+      border-radius: var(--r); font-size: .82rem; color: var(--red);
+      font-family: var(--font);
+    }
+
+    /* ── INPUT AREA ───────────────────────────────────────── */
+    .input-area {
+      padding: 14px 20px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    /* Image preview strip */
+    .preview-strip {
+      display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .preview-thumb {
+      position: relative;
+      width: 56px; height: 56px; border-radius: var(--r-sm);
+      overflow: hidden; border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .preview-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-thumb .remove-btn {
+      position: absolute; top: 2px; right: 2px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: rgba(0,0,0,.7); color: #fff;
+      border: none; cursor: pointer; font-size: 9px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .preview-thumb.camera-thumb {
+      background: var(--surface-3);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--ink-3); font-size: 20px;
+    }
+
+    .input-row {
+      display: flex; gap: 8px; align-items: flex-end;
+    }
+    .input-col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .input-toolbar { display: flex; gap: 4px; }
+    .tool-btn {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .71rem; font-weight: 600; color: var(--ink-3);
+      background: var(--surface-2); border: 1px solid var(--border);
+      padding: 5px 10px; border-radius: var(--r-sm); cursor: pointer;
+      transition: var(--t); font-family: var(--font);
+      white-space: nowrap;
+    }
+    .tool-btn:hover { background: var(--surface-3); color: var(--ink); border-color: var(--border-2); }
+    .tool-btn.active { background: var(--accent-glow); border-color: rgba(109,109,246,.3); color: var(--accent-2); }
+    .tool-btn svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8; flex-shrink:0; }
+    #mathInput {
+      width: 100%; padding: 11px 16px;
+      border: 1px solid var(--border); border-radius: var(--r);
+      background: var(--surface-2); color: var(--ink);
+      font-family: var(--font); font-size: .84rem;
+      resize: none; outline: none;
+      transition: border-color .16s;
+      min-height: 46px; max-height: 160px;
+      overflow-y: auto; line-height: 1.55;
+    }
+    #mathInput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(109,109,246,.12); }
+    #mathInput::placeholder { color: var(--ink-4); }
+    .send-btn {
+      width: 46px; height: 46px; border-radius: var(--r);
+      background: var(--accent); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--t); flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(109,109,246,.4);
+    }
+    .send-btn:hover { background: var(--accent-2); box-shadow: 0 6px 24px rgba(109,109,246,.5); transform: translateY(-1px); }
+    .send-btn:active { transform: translateY(0); }
+    .send-btn:disabled { background: var(--surface-3); box-shadow: none; cursor: not-allowed; transform: none; }
+    .send-btn svg { width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round; }
+    .input-hint {
+      font-size: .67rem; color: var(--ink-4); font-family: var(--font);
+      display: flex; align-items: center; gap: 8px;
+    }
+    kbd {
+      font-family: var(--mono); background: var(--surface-3);
+      border: 1px solid var(--border); padding: 1px 5px;
+      border-radius: 3px; font-size: .67rem;
+    }
+
+    /* ── CAMERA MODAL ──────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,.85);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeIn .15s ease;
+    }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .modal-overlay.hidden { display: none; }
+    .camera-modal {
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-xl);
+      padding: 0;
+      width: min(520px, 95vw);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      animation: slideUp .2s ease;
+    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-header h3 { font-size: .9rem; font-weight: 700; color: var(--ink); }
+    .modal-close {
+      width: 28px; height: 28px; border-radius: var(--r-sm);
+      background: var(--surface-3); border: 1px solid var(--border);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--ink-3); font-size: 14px; font-weight: 700;
+      transition: var(--t);
+    }
+    .modal-close:hover { background: var(--red-dim); color: var(--red); }
+    .camera-view {
+      position: relative; background: #000;
+      width: 100%; height: 280px; overflow: hidden;
+    }
+    #cameraVideo {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    #captureCanvas { display: none; }
+    .camera-overlay {
+      position: absolute; inset: 0;
+      border: 2px solid rgba(109,109,246,.0);
+      pointer-events: none;
+    }
+    .scan-line {
+      position: absolute; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      animation: scan 2s ease-in-out infinite;
+      opacity: 0;
+    }
+    .scanning .scan-line { opacity: 1; }
+    @keyframes scan {
+      0%{top:10%} 50%{top:85%} 100%{top:10%}
+    }
+    .corner {
+      position: absolute; width: 24px; height: 24px;
+      border-color: var(--accent); border-style: solid;
+      opacity: .8;
+    }
+    .corner.tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+    .corner.tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+    .corner.bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+    .corner.br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+    .modal-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+    .modal-actions { display: flex; gap: 8px; }
+    .modal-btn {
+      flex: 1; padding: 10px; border-radius: var(--r);
+      font-size: .8rem; font-weight: 700; cursor: pointer;
+      transition: var(--t); font-family: var(--font); border: 1px solid var(--border);
+    }
+    .modal-btn.primary {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(109,109,246,.35);
+    }
+    .modal-btn.primary:hover { background: var(--accent-2); }
+    .modal-btn.secondary { background: var(--surface-2); color: var(--ink-2); }
+    .modal-btn.secondary:hover { background: var(--surface-3); color: var(--ink); }
+    .modal-hint { font-size: .73rem; color: var(--ink-3); text-align: center; line-height: 1.5; }
+
+    /* ── RIGHT PANEL ─────────────────────────────────────── */
+    .sidebar-right {
+      background: var(--surface);
+      border-left: 0 solid var(--border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      width: 0;
+      flex-shrink: 0;
+      transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1), border-left-width 0.22s ease;
+    }
+    .layout.show-right-sidebar .sidebar-right {
+      width: 280px;
+      border-left-width: 1px;
+    }
+    .panel-tabs {
+      display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .panel-tab {
+      flex: 1; padding: 10px 4px;
+      font-size: .71rem; font-weight: 700; letter-spacing: .04em;
+      text-transform: uppercase; color: var(--ink-4);
+      background: none; border: none; cursor: pointer;
+      transition: var(--t); font-family: var(--font);
+      border-bottom: 2px solid transparent;
+    }
+    .panel-tab:hover { color: var(--ink-2); }
+    .panel-tab.active { color: var(--accent-2); border-bottom-color: var(--accent); }
+    .panel-pane { display: none; flex: 1; overflow-y: auto; }
+    .panel-pane.active { display: flex; flex-direction: column; }
+    .panel-section {
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-label {
+      font-size: .64rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--ink-4); margin-bottom: 10px;
+    }
+
+    /* Settings controls */
+    .setting-row {
+      display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px;
+    }
+    .setting-label { font-size: .76rem; font-weight: 500; color: var(--ink-2); }
+    .setting-select {
+      padding: 6px 10px; border-radius: var(--r-sm);
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--ink-2); font-size: .78rem; font-family: var(--font);
+      cursor: pointer; outline: none;
+    }
+    .setting-select:focus { border-color: var(--accent); }
+    .setting-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0;
+    }
+    .toggle {
+      width: 36px; height: 20px; border-radius: 10px;
+      background: var(--surface-4); position: relative;
+      cursor: pointer; transition: background .2s; border: none; flex-shrink: 0;
+    }
+    .toggle.on { background: var(--accent); }
+    .toggle::after {
+      content: ''; position: absolute;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; top: 3px; left: 3px;
+      transition: transform .2s; box-shadow: 0 1px 4px rgba(0,0,0,.3);
+    }
+    .toggle.on::after { transform: translateX(16px); }
+    .range-row { display: flex; align-items: center; gap: 8px; }
+    .range-val { font-size: .72rem; color: var(--ink-3); min-width: 30px; text-align: right; font-family: var(--mono); }
+    input[type=range] {
+      flex: 1; height: 3px; border-radius: 2px;
+      background: var(--surface-4); outline: none; cursor: pointer;
+      -webkit-appearance: none; appearance: none;
+      accent-color: var(--accent);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; cursor: pointer;
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    /* Stat cards */
+    .stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      padding: 12px;
+    }
+    .stat-card {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 10px 12px;
+    }
+    .stat-label { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 4px; }
+    .stat-val { font-size: 1.4rem; font-weight: 700; color: var(--ink); font-family: var(--mono); line-height: 1; }
+    .stat-sub { font-size: .65rem; color: var(--ink-4); margin-top: 2px; }
+
+    /* Example prompts */
+    .examples-grid { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; }
+    .ex-btn {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px 10px; border-radius: var(--r-sm);
+      background: none; border: 1px solid transparent;
+      cursor: pointer; transition: var(--t); text-align: left;
+      font-family: var(--font);
+    }
+    .ex-btn:hover { background: var(--surface-2); border-color: var(--border); }
+    .ex-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .ex-text { font-size: .74rem; color: var(--ink-3); line-height: 1.4; }
+    .ex-text strong { display: block; color: var(--ink-2); font-size: .76rem; margin-bottom: 1px; }
+
+    /* ── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .sidebar-left { display: none; }
+      .sidebar-right {
+        position: fixed;
+        right: 0;
+        top: 56px;
+        bottom: 0;
+        z-index: 150;
+        height: calc(100dvh - 56px);
+        box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+      }
+    }
+    @media (max-width: 640px) {
+      #chatMessages { padding: 16px; gap: 16px; }
+      .input-area { padding: 10px 14px 12px; }
+    }
+
+    /* ── LIGHT THEME OVERRIDES ──────────────────────────────── */
+    :root.light-theme {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --surface-3: #e2e8f0;
+      --surface-4: #cbd5e1;
+      --border: rgba(0,0,0,.08);
+      --border-2: rgba(0,0,0,.14);
+      --ink: #0f172a;
+      --ink-2: #334155;
+      --ink-3: #64748b;
+      --ink-4: #94a3b8;
+      --accent: #4f46e5;
+      --accent-2: #6366f1;
+      --accent-glow: rgba(79,70,229,.1);
+      --green: #16a34a;
+      --green-dim: rgba(22,163,74,.1);
+      --amber: #d97706;
+      --amber-dim: rgba(217,119,6,.1);
+      --red: #dc2626;
+      --red-dim: rgba(220,38,38,.1);
+      --blue: #2563eb;
+      --blue-dim: rgba(37,99,235,.1);
+      --violet: #7c3aed;
+      --violet-dim: rgba(124,58,237,.1);
+      --shadow: 0 8px 30px rgba(0,0,0,.08);
+    }
+    .light-theme .nav {
+      background: rgba(255,255,255,.85);
+    }
+    .light-theme #mathInput {
+      background: #ffffff;
+    }
+    .light-theme .welcome-state p {
+      color: var(--ink-2);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="nav">
+  <a href="dashboard.html" class="nav-logo">Zen<em>space</em></a>
+  <span class="nav-badge">PhD MATH</span>
+  <div class="nav-spacer"></div>
+  <div class="nav-pill"><div class="dot"></div>Agent Active</div>
+  <div class="nav-user-btn" id="navUserBtn">
+    <div class="nav-avatar" id="navAvatar">U</div>
+    <span id="navName">User</span>
+  </div>
+</nav>
+
+<!-- ══ LAYOUT ══ -->
+<div class="layout">
+
+  <!-- MAIN CHAT -->
+  <main class="main">
+    <!-- History Popover -->
+    <div class="history-popover" id="historyPopover">
+      <div class="history-popover-header">
+        <span>Recent Problems</span>
+        <button class="icon-btn" onclick="toggleHistoryPopover(event)" style="padding:4px;border:none;background:none;cursor:pointer;">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="hist-list" id="histList" style="flex:1;overflow-y:auto;padding:8px 12px 12px;">
+        <div style="font-size:.72rem;color:var(--ink-4);padding:4px 10px;font-family:var(--font)">No history yet</div>
+      </div>
+      <div class="history-popover-footer" style="padding:8px 12px;border-top:1px solid var(--border);">
+        <button class="nav-link" style="color:var(--red);width:100%;justify-content:center;font-size:.75rem;display:flex;align-items:center;gap:6px;padding:6px;border-radius:6px;border:none;background:none;cursor:pointer;" onclick="clearAll()">
+          <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+          Clear All
+        </button>
+      </div>
+    </div>
+
+    <!-- Topbar -->
+    <div class="chat-topbar">
+      <div class="agent-icon">∑</div>
+      <div class="topbar-info">
+        <h3>Zenlab</h3>
+        <p id="agentStatus">PhD-level solver · Vision enabled · Step-by-step reasoning</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Recent History" onclick="toggleHistoryPopover(event)" id="historyBtn">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button class="icon-btn" title="Download conversation" onclick="downloadChat()">
+          <svg viewBox="0 0 24 24"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg>
+        </button>
+        <button class="icon-btn" title="Clear chat" onclick="clearChat()">
+          <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        </button>
+        <button class="icon-btn" title="Toggle Settings & Examples" onclick="toggleRightSidebar()" id="toggleSettingsBtn">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+        <button class="icon-btn" title="Toggle Light/Dark Theme" onclick="toggleTheme()" id="themeToggleBtn">
+          <svg viewBox="0 0 24 24" id="themeIcon" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707-.707M12 7a5 5 0 100 10 5 5 0 000-10z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mode bar -->
+    <div class="mode-bar">
+      <button class="mode-btn active" onclick="setMode('step-by-step',this)">Step-by-Step</button>
+      <button class="mode-btn" onclick="setMode('direct',this)">Direct Answer</button>
+      <button class="mode-btn" onclick="setMode('proof',this)">Formal Proof</button>
+      <button class="mode-btn" onclick="setMode('verify',this)">Verify</button>
+      <button class="mode-btn" onclick="setMode('explore',this)">Deep Explore</button>
+      <button class="mode-btn" onclick="setMode('phd',this)">⚡ PhD Mode</button>
+    </div>
+
+    <!-- Subject Selector Bar -->
+    <div class="subject-bar" id="subjectBar">
+      <div class="subject-row">
+        <span class="subject-label">Subject</span>
+        <button class="subj-pill active" data-subj="math" onclick="selectSubject('math',this)">📐 Mathematics</button>
+        <button class="subj-pill" data-subj="physics" onclick="selectSubject('physics',this)">⚛️ Physics</button>
+        <button class="subj-pill" data-subj="chemistry" onclick="selectSubject('chemistry',this)">🧪 Chemistry</button>
+        <button class="subj-pill" data-subj="biology" onclick="selectSubject('biology',this)">🧬 Biology</button>
+        <button class="subj-pill" data-subj="cs" onclick="selectSubject('cs',this)">💻 Comp. Sci</button>
+        <button class="subj-pill" data-subj="economics" onclick="selectSubject('economics',this)">📊 Economics</button>
+      </div>
+      <div class="topic-row show" id="topicRow">
+        <span class="subject-label">Topic</span>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="chatMessages">
+      <div class="welcome-state" id="welcomeState">
+        <div class="welcome-orb">∑</div>
+        <h2>Zen<em>lab</em></h2>
+        <p>PhD-level mathematics powered by Llama 3.3. Handles everything from undergraduate calculus to graduate-level real analysis, algebraic topology, measure theory, abstract algebra, and beyond. Now with vision — scan or photograph any problem.</p>
+        <div class="capability-pills">
+          <span class="cap-pill">∫ Analysis</span>
+          <span class="cap-pill">∑ Algebra</span>
+          <span class="cap-pill">⊗ Linear Algebra</span>
+          <span class="cap-pill">σ Probability</span>
+          <span class="cap-pill">∂ PDEs / ODEs</span>
+          <span class="cap-pill">ℕ Number Theory</span>
+          <span class="cap-pill">⌂ Topology</span>
+          <span class="cap-pill">∇ Differential Geometry</span>
+          <span class="cap-pill">∀ Logic & Proofs</span>
+          <span class="cap-pill">∞ Measure Theory</span>
+          <span class="cap-pill">📸 Vision OCR</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <!-- Image preview strip -->
+      <div class="preview-strip" id="previewStrip" style="display:none"></div>
+
+      <div class="input-row">
+        <div class="input-col">
+          <div class="input-toolbar">
+            <button class="tool-btn" id="cameraBtn" onclick="openCamera()" title="Scan with camera">
+              <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Scan
+            </button>
+            <label class="tool-btn" for="imageUpload" title="Upload image of problem">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload
+              <input type="file" id="imageUpload" accept="image/*" multiple style="display:none" onchange="handleImageUpload(event)">
+            </label>
+            <button class="tool-btn" id="latexBtn" onclick="toggleLatexHelper()" title="LaTeX helper">
+              <svg viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+              LaTeX
+            </button>
+          </div>
+          <textarea
+            id="mathInput"
+            rows="1"
+            placeholder="Ask any math problem… e.g. Prove the Riemann hypothesis is equivalent to… or Solve the Navier–Stokes… or just snap a photo ↑"
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+          <div class="input-hint">
+            <kbd>Enter</kbd> send · <kbd>Shift+Enter</kbd> newline · Supports LaTeX $…$ and $$…$$
+          </div>
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="sidebar-right">
+    <div class="panel-tabs">
+      <button class="panel-tab active" onclick="switchPanel('settings',this)">Settings</button>
+      <button class="panel-tab" onclick="switchPanel('examples',this)">Examples</button>
+      <button class="panel-tab" onclick="switchPanel('stats',this)">Stats</button>
+    </div>
+
+    <!-- Settings pane -->
+    <div class="panel-pane active" id="pane-settings">
+
+      <!-- ── API KEY ────────────────────────────────────── -->
+      <div class="panel-section" style="background:rgba(139,92,246,.08);border-radius:10px;padding:12px 14px;margin-bottom:2px">
+        <div class="panel-label" style="color:var(--accent-2);margin-bottom:6px">⚡ AI Engine</div>
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(139,92,246,.25);border-radius:8px;padding:8px 12px">
+          <span style="font-size:1.1rem">🤖</span>
+          <div>
+            <div style="font-size:.78rem;font-weight:600;color:var(--ink-1)">Groq — Llama 3.3 70B</div>
+            <div style="font-size:.67rem;color:var(--ink-4)">PhD-level math · Ultra-fast inference</div>
+          </div>
+          <span style="margin-left:auto;font-size:.65rem;background:rgba(74,222,128,.15);color:#4ade80;border-radius:20px;padding:2px 8px;font-weight:600">FREE</span>
+        </div>
+        <div style="margin-top:12px; border-top:1px solid rgba(139,92,246,.15); padding-top:12px">
+          <div class="setting-toggle-row" style="padding:0">
+            <span class="setting-label" style="font-size:.76rem; font-weight: 600;">Use Custom API Key</span>
+            <button class="toggle" id="togCustomKey" onclick="toggleCustomKey()"></button>
+          </div>
+          <div id="customKeyContainer" style="display:none; margin-top:8px">
+            <div style="position:relative">
+              <input
+                type="password"
+                id="customApiKeyInput"
+                placeholder="gsk_…"
+                oninput="saveCustomApiKey()"
+                style="width:100%;box-sizing:border-box;background:var(--surface-2);border:1px solid var(--border-2);border-radius:var(--r-sm);padding:8px 36px 8px 10px;font-size:.78rem;color:var(--ink-2);font-family:var(--mono);outline:none;transition:border-color .2s"
+                onfocus="this.style.borderColor='var(--accent)'"
+                onblur="this.style.borderColor='var(--border-2)'"
+              />
+              <button onclick="toggleCustomKeyVis()" title="Show/hide key" id="customApiVisBtn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--ink-3);font-size:.9rem;padding:0;line-height:1">👁</button>
+            </div>
+            <div id="customKeyStatus" style="font-size:.66rem;margin-top:5px;color:var(--ink-3)">Enter your own key from console.groq.com.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Solver Settings</div>
+        <div class="setting-row">
+          <div class="setting-label">Response Detail</div>
+          <select class="setting-select" id="settingDetail">
+            <option value="comprehensive">Comprehensive</option>
+            <option value="concise">Concise</option>
+            <option value="minimal">Minimal</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Domain Focus</div>
+          <select class="setting-select" id="settingDomain">
+            <option value="auto">Auto-detect</option>
+            <option value="algebra">Abstract Algebra</option>
+            <option value="analysis">Real Analysis</option>
+            <option value="complex">Complex Analysis</option>
+            <option value="topology">Topology</option>
+            <option value="diff_geo">Differential Geometry</option>
+            <option value="calculus">Calculus</option>
+            <option value="linear_algebra">Linear Algebra</option>
+            <option value="statistics">Probability & Stats</option>
+            <option value="number_theory">Number Theory</option>
+            <option value="pde">PDEs</option>
+            <option value="combinatorics">Combinatorics</option>
+            <option value="logic">Mathematical Logic</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Temperature</div>
+          <div class="range-row">
+            <input type="range" min="0" max="100" value="15" id="settingTemp" oninput="document.getElementById('tempVal').textContent=(this.value/100).toFixed(2)">
+            <span class="range-val" id="tempVal">0.15</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-label">Display Options</div>
+        <div class="setting-toggle-row">
+          <span class="setting-label">Show Reasoning</span>
+          <button class="toggle on" id="togReasoning" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="setting-toggle-row">
+          <span class="setting-label">LaTeX Rendering</span>
+          <button class="toggle on" id="togLatex" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="setting-toggle-row">
+          <span class="setting-label">Show Confidence</span>
+          <button class="toggle" id="togConf" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="setting-toggle-row">
+          <span class="setting-label">Auto-verify</span>
+          <button class="toggle" id="togVerify" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+      <div class="panel-section" style="border-bottom:none">
+        <div class="panel-label">PhD Mode Options</div>
+        <div class="setting-toggle-row">
+          <span class="setting-label">Cite Theorems</span>
+          <button class="toggle on" id="togCite" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="setting-toggle-row">
+          <span class="setting-label">Show Generalizations</span>
+          <button class="toggle" id="togGen" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="setting-toggle-row">
+          <span class="setting-label">Open Problems</span>
+          <button class="toggle" id="togOpen" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Examples pane -->
+    <div class="panel-pane" id="pane-examples">
+      <div class="examples-grid" id="examplesGrid"></div>
+    </div>
+
+    <!-- Stats pane -->
+    <div class="panel-pane" id="pane-stats">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Solved</div>
+          <div class="stat-val" id="statSolved">0</div>
+          <div class="stat-sub">this session</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Time</div>
+          <div class="stat-val" id="statTime">—</div>
+          <div class="stat-sub">seconds</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Images</div>
+          <div class="stat-val" id="statImages">0</div>
+          <div class="stat-sub">scanned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Mode</div>
+          <div class="stat-val" style="font-size:.75rem;margin-top:2px" id="statMode">Step</div>
+          <div class="stat-sub">active</div>
+        </div>
+      </div>
+      <div class="panel-section" style="border-bottom:none">
+        <div class="panel-label">Session Domains</div>
+        <div id="domainStats" style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
+          <div style="font-size:.72rem;color:var(--ink-4);font-family:var(--font)">No problems solved yet</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ══ CAMERA MODAL ══ -->
+<div class="modal-overlay hidden" id="cameraOverlay" onclick="closeCameraOnBackdrop(event)">
+  <div class="camera-modal">
+    <div class="modal-header">
+      <h3>📸 Scan Math Problem</h3>
+      <button class="modal-close" onclick="closeCamera()">✕</button>
+    </div>
+    <div class="camera-view" id="cameraView">
+      <video id="cameraVideo" autoplay playsinline muted></video>
+      <canvas id="captureCanvas"></canvas>
+      <div class="camera-overlay scanning" id="camOverlay">
+        <div class="scan-line"></div>
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-actions">
+        <button class="modal-btn secondary" onclick="closeCamera()">Cancel</button>
+        <button class="modal-btn primary" id="captureBtn" onclick="capturePhoto()">
+          📸 Capture
+        </button>
+      </div>
+      <div class="modal-hint" id="cameraHint">
+        Position the math problem clearly in frame · Good lighting helps · Works with handwritten or printed text
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   APEX MATH AGENT — PhD-Level AI Solver with Vision
+   Claude claude-sonnet-4-20250514 + vision for image problems
+   Features:
+   • Multi-turn conversation with full history
+   • Camera capture & image upload → base64 → Claude vision
+   • 6 solver modes including PhD Mode
+   • Cubic-spline-like system prompt engineering
+   • Per-domain expertise routing
+   • KaTeX rendering with fallback
+   • Bilateral-filter-style response parsing
+══════════════════════════════════════════════════════════════ */
+
+const STATE = {
+  mode: 'step-by-step',
+  messages: [],       // API message history
+  history: [],        // sidebar problem history
+  pendingImages: [],  // { dataUrl, base64, mimeType }
+  solved: 0,
+  totalTime: 0,
+  imagesScanned: 0,
+  isLoading: false,
+  domainCounts: {},
+};
+
+// ── EXAMPLES ──────────────────────────────────────────────────
+const EXAMPLES = [
+  { icon:'∫', title:'Stokes\' Theorem', prompt:'State and prove Stokes\' theorem in the context of differential forms on smooth manifolds.' },
+  { icon:'⊗', title:'Spectral Theorem', prompt:'Prove the spectral theorem for compact self-adjoint operators on a Hilbert space.' },
+  { icon:'ℕ', title:'Quadratic Reciprocity', prompt:'Prove the law of quadratic reciprocity using Gauss\'s lemma.' },
+  { icon:'∂', title:'Heat Equation', prompt:'Solve the heat equation u_t = α·u_xx on [0,L] with u(0,t)=u(L,t)=0 and u(x,0)=f(x) using separation of variables.' },
+  { icon:'⌂', title:'Fundamental Group', prompt:'Compute the fundamental group of the torus T² and prove it is ℤ×ℤ.' },
+  { icon:'σ', title:'Central Limit Theorem', prompt:'Prove the Lindeberg–Lévy central limit theorem using characteristic functions.' },
+  { icon:'∀', title:'Gödel Incompleteness', prompt:'Explain the proof strategy of Gödel\'s first incompleteness theorem, including the construction of the Gödel sentence.' },
+  { icon:'∇', title:'Riemann Curvature', prompt:'Derive the Riemann curvature tensor and explain its geometric significance in terms of parallel transport.' },
+  { icon:'∞', title:'Lebesgue Integration', prompt:'Prove the Dominated Convergence Theorem for Lebesgue integration.' },
+  { icon:'∑', title:'Galois Theory', prompt:'Prove that a polynomial is solvable by radicals if and only if its Galois group is solvable.' },
+  { icon:'ℂ', title:'Residue Theorem', prompt:'State and prove the residue theorem and use it to evaluate ∫₋∞^∞ (sin x)/x dx.' },
+  { icon:'📐', title:'PhD Problem', prompt:'Let f: ℝⁿ → ℝ be a smooth function with ∇f(x) ≠ 0 for all x in a level set S = f⁻¹(c). Prove S is a smooth manifold of dimension n−1 and compute its tangent space.' },
+];
+
+// ── API KEY MANAGEMENT ────────────────────────────────────────
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+
+
+// ── INIT ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  loadThemeSetting();
+  loadCustomKeySettings();
+  buildExamples();
+  loadHistory();
+  renderTopics(STATE.subject);
+  updateAgentStatus();
+
+  if (typeof ZenAuth !== 'undefined') {
+    try {
+      await ZenAuth.initSupabase();
+      const p = await ZenAuth.getUserProfile();
+      if (p) {
+        document.getElementById('navName').textContent = p.name || p.email;
+        document.getElementById('navAvatar').textContent = (p.name || p.email || 'U')[0].toUpperCase();
+      }
+    } catch(e) {}
+  }
+});
+
+function buildExamples() {
+  const grid = document.getElementById('examplesGrid');
+  grid.innerHTML = EXAMPLES.map((ex, i) => `
+    <button class="ex-btn" onclick="useExample(${i})">
+      <div class="ex-icon">${ex.icon}</div>
+      <div class="ex-text">
+        <strong>${ex.title}</strong>
+        ${ex.prompt.substring(0, 60)}…
+      </div>
+    </button>`).join('');
+}
+
+function useExample(i) {
+  const ex = EXAMPLES[i];
+  document.getElementById('mathInput').value = ex.prompt;
+  autoResize(document.getElementById('mathInput'));
+  document.getElementById('mathInput').focus();
+}
+
+// ── SUBJECT / TOPIC DATA ──────────────────────────────────────
+const SUBJECT_DATA = {
+  math: {
+    label: '📐 Mathematics',
+    prompt: 'You are an expert PhD-level mathematics professor.',
+    topics: [
+      { id:'algebra',       label:'Algebra',             prompt:'Focus on abstract algebra, group theory, ring theory, and field theory.' },
+      { id:'calculus',      label:'Calculus',             prompt:'Focus on differential and integral calculus, limits, and series.' },
+      { id:'linear_algebra',label:'Linear Algebra',       prompt:'Focus on vectors, matrices, linear transformations, eigenvalues, and eigenvectors.' },
+      { id:'statistics',    label:'Statistics & Probability', prompt:'Focus on probability theory, distributions, statistical inference, and stochastic processes.' },
+      { id:'number_theory', label:'Number Theory',        prompt:'Focus on primes, divisibility, modular arithmetic, and Diophantine equations.' },
+      { id:'topology',      label:'Topology',             prompt:'Focus on topological spaces, homeomorphisms, compactness, and connectedness.' },
+      { id:'analysis',      label:'Real Analysis',        prompt:'Focus on limits, continuity, differentiation, integration, and measure theory.' },
+      { id:'complex',       label:'Complex Analysis',     prompt:'Focus on complex functions, contour integration, residues, and conformal mappings.' },
+      { id:'odes',          label:'Differential Equations', prompt:'Focus on ODEs, PDEs, initial value problems, and boundary value problems.' },
+      { id:'discrete',      label:'Discrete Math',        prompt:'Focus on combinatorics, graph theory, logic, and set theory.' },
+    ]
+  },
+  physics: {
+    label: '⚛️ Physics',
+    prompt: 'You are an expert PhD-level physics professor with deep knowledge of theoretical and experimental physics.',
+    topics: [
+      { id:'mechanics',     label:'Classical Mechanics',  prompt:'Focus on Newtonian mechanics, Lagrangian/Hamiltonian mechanics, rotational dynamics, and rigid body motion.' },
+      { id:'electro',       label:'Electromagnetism',     prompt:'Focus on Maxwell\'s equations, electric/magnetic fields, electromagnetic waves, and circuits.' },
+      { id:'quantum',       label:'Quantum Mechanics',    prompt:'Focus on wave functions, Schrödinger equation, operators, quantum states, and uncertainty principle.' },
+      { id:'thermo',        label:'Thermodynamics',       prompt:'Focus on laws of thermodynamics, entropy, heat engines, statistical mechanics, and phase transitions.' },
+      { id:'relativity',    label:'Relativity',           prompt:'Focus on special and general relativity, Lorentz transformations, spacetime, and Einstein field equations.' },
+      { id:'optics',        label:'Optics & Waves',       prompt:'Focus on wave optics, geometric optics, interference, diffraction, and polarization.' },
+      { id:'nuclear',       label:'Nuclear & Particle Physics', prompt:'Focus on nuclear reactions, radioactivity, particle physics, and the Standard Model.' },
+      { id:'solid_state',   label:'Solid State Physics',  prompt:'Focus on crystal structures, band theory, semiconductors, superconductivity, and condensed matter.' },
+      { id:'astro',         label:'Astrophysics',         prompt:'Focus on stellar physics, cosmology, black holes, and gravitational waves.' },
+    ]
+  },
+  chemistry: {
+    label: '🧪 Chemistry',
+    prompt: 'You are an expert PhD-level chemistry professor with mastery of all branches of chemistry.',
+    topics: [
+      { id:'organic',       label:'Organic Chemistry',    prompt:'Focus on organic reactions, mechanisms, functional groups, stereochemistry, and synthesis.' },
+      { id:'inorganic',     label:'Inorganic Chemistry',  prompt:'Focus on coordination chemistry, transition metals, ionic compounds, and crystal field theory.' },
+      { id:'physical',      label:'Physical Chemistry',   prompt:'Focus on thermodynamics, kinetics, quantum chemistry, and spectroscopy.' },
+      { id:'analytical',    label:'Analytical Chemistry', prompt:'Focus on titrations, chromatography, spectroscopic methods, and quantitative analysis.' },
+      { id:'biochemistry',  label:'Biochemistry',         prompt:'Focus on biomolecules, enzymes, metabolic pathways, and molecular biology.' },
+      { id:'electrochemistry', label:'Electrochemistry',  prompt:'Focus on redox reactions, electrochemical cells, Nernst equation, and electrolysis.' },
+      { id:'polymer',       label:'Polymer Chemistry',    prompt:'Focus on polymerization mechanisms, polymer properties, and materials science.' },
+    ]
+  },
+  biology: {
+    label: '🧬 Biology',
+    prompt: 'You are an expert PhD-level biologist with comprehensive knowledge across all biological sciences.',
+    topics: [
+      { id:'cell_bio',      label:'Cell Biology',         prompt:'Focus on cell structure, organelles, cell signaling, cell division, and the cell cycle.' },
+      { id:'genetics',      label:'Genetics & Genomics',  prompt:'Focus on Mendelian genetics, molecular genetics, gene expression, mutations, and genomics.' },
+      { id:'evolution',     label:'Evolution',            prompt:'Focus on natural selection, phylogenetics, speciation, adaptation, and population genetics.' },
+      { id:'ecology',       label:'Ecology',              prompt:'Focus on ecosystems, population dynamics, food webs, biodiversity, and environmental interactions.' },
+      { id:'microbiology',  label:'Microbiology',         prompt:'Focus on bacteria, viruses, fungi, microbial metabolism, and infectious diseases.' },
+      { id:'physiology',    label:'Human Physiology',     prompt:'Focus on organ systems, homeostasis, nervous system, cardiovascular, and endocrine systems.' },
+      { id:'molecular_bio', label:'Molecular Biology',    prompt:'Focus on DNA replication, transcription, translation, gene regulation, and recombinant DNA.' },
+      { id:'neuroscience',  label:'Neuroscience',         prompt:'Focus on neural circuits, synaptic transmission, brain function, and neurological disorders.' },
+    ]
+  },
+  cs: {
+    label: '💻 Computer Science',
+    prompt: 'You are an expert PhD-level computer scientist with deep knowledge of theory and practice.',
+    topics: [
+      { id:'algorithms',    label:'Algorithms & DSA',     prompt:'Focus on algorithm design, data structures, time/space complexity, and optimization.' },
+      { id:'theory',        label:'Theory of Computation', prompt:'Focus on automata theory, formal languages, Turing machines, computability, and complexity theory.' },
+      { id:'ml',            label:'Machine Learning',     prompt:'Focus on supervised/unsupervised learning, neural networks, optimization, and statistical learning.' },
+      { id:'systems',       label:'Systems Programming',  prompt:'Focus on operating systems, memory management, concurrency, and low-level programming.' },
+      { id:'databases',     label:'Databases',            prompt:'Focus on relational algebra, SQL, query optimization, transactions, and NoSQL systems.' },
+      { id:'networking',    label:'Computer Networks',    prompt:'Focus on network protocols, TCP/IP, routing algorithms, and distributed systems.' },
+      { id:'cryptography',  label:'Cryptography',         prompt:'Focus on symmetric/asymmetric encryption, hash functions, digital signatures, and number theory.' },
+      { id:'ai',            label:'Artificial Intelligence', prompt:'Focus on search algorithms, knowledge representation, planning, and AI reasoning.' },
+    ]
+  },
+  economics: {
+    label: '📊 Economics',
+    prompt: 'You are an expert PhD-level economist with deep knowledge of economic theory and quantitative methods.',
+    topics: [
+      { id:'micro',         label:'Microeconomics',       prompt:'Focus on supply and demand, consumer theory, firm behavior, market structures, and game theory.' },
+      { id:'macro',         label:'Macroeconomics',       prompt:'Focus on GDP, inflation, monetary policy, fiscal policy, and business cycles.' },
+      { id:'econometrics',  label:'Econometrics',         prompt:'Focus on regression analysis, time series, panel data, and causal inference.' },
+      { id:'finance',       label:'Financial Economics',  prompt:'Focus on asset pricing, portfolio theory, derivatives, risk management, and market efficiency.' },
+      { id:'behavioral',    label:'Behavioral Economics', prompt:'Focus on cognitive biases, prospect theory, decision-making under uncertainty, and nudges.' },
+      { id:'intl_trade',    label:'International Trade',  prompt:'Focus on comparative advantage, trade policy, exchange rates, and global supply chains.' },
+    ]
+  }
+};
+
+// ── SUBJECT SELECTOR LOGIC ────────────────────────────────────
+STATE.subject = 'math';
+STATE.topic = null;
+
+function selectSubject(subjId, btn) {
+  STATE.subject = subjId;
+  STATE.topic = null;
+  document.querySelectorAll('.subj-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderTopics(subjId);
+  updateAgentStatus();
+}
+
+function selectTopic(topicId, btn) {
+  STATE.topic = topicId === STATE.topic ? null : topicId; // toggle off if already selected
+  document.querySelectorAll('.topic-pill').forEach(p => p.classList.remove('active'));
+  if (STATE.topic) btn.classList.add('active');
+  updateAgentStatus();
+}
+
+function renderTopics(subjId) {
+  const row = document.getElementById('topicRow');
+  const subj = SUBJECT_DATA[subjId];
+  if (!subj || !subj.topics.length) { row.classList.remove('show'); return; }
+  row.innerHTML = `<span class="subject-label">Topic</span>` +
+    subj.topics.map(t =>
+      `<button class="topic-pill" data-topic="${t.id}" onclick="selectTopic('${t.id}',this)">${t.label}</button>`
+    ).join('');
+  row.classList.add('show');
+}
+
+function updateAgentStatus() {
+  const subj = SUBJECT_DATA[STATE.subject];
+  const topicObj = subj?.topics?.find(t => t.id === STATE.topic);
+  const status = topicObj ? `${subj.label} · ${topicObj.label}` : (subj?.label || 'PhD-level solver');
+  document.getElementById('agentStatus').textContent = `${status} · Vision enabled`;
+}
+
+// ── MODE ──────────────────────────────────────────────────────
+function setMode(mode, btn) {
+  STATE.mode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const labels = {
+    'step-by-step': 'Step',
+    'direct': 'Direct',
+    'proof': 'Proof',
+    'verify': 'Verify',
+    'explore': 'Explore',
+    'phd': 'PhD⚡',
+  };
+  document.getElementById('statMode').textContent = labels[mode] || mode;
+}
+
+function switchPanel(name, btn) {
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pane-' + name).classList.add('active');
+}
+
+function toggleRightSidebar() {
+  const layout = document.querySelector('.layout');
+  const btn = document.getElementById('toggleSettingsBtn');
+  const isOpen = layout.classList.toggle('show-right-sidebar');
+  if (isOpen) {
+    btn.classList.add('active');
+  } else {
+    btn.classList.remove('active');
+  }
+}
+
+// ── THEME & CUSTOM KEY HELPERS ────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.classList.toggle('light-theme');
+  localStorage.setItem('zs-math-theme', isLight ? 'light' : 'dark');
+  updateThemeIcon(isLight);
+}
+
+function updateThemeIcon(isLight) {
+  const icon = document.getElementById('themeIcon');
+  if (!icon) return;
+  if (isLight) {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+  } else {
+    icon.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707-.707M12 7a5 5 0 100 10 5 5 0 000-10z"/>';
+  }
+}
+
+function loadThemeSetting() {
+  const saved = localStorage.getItem('zs-math-theme');
+  const isLight = saved === 'light';
+  if (isLight) {
+    document.documentElement.classList.add('light-theme');
+  } else {
+    document.documentElement.classList.remove('light-theme');
+  }
+  updateThemeIcon(isLight);
+}
+
+function toggleCustomKey() {
+  const btn = document.getElementById('togCustomKey');
+  const container = document.getElementById('customKeyContainer');
+  const isOn = btn.classList.toggle('on');
+  container.style.display = isOn ? 'block' : 'none';
+  localStorage.setItem('zs-math-use-custom-key', isOn ? 'true' : 'false');
+  updateCustomKeyStatus();
+}
+
+function saveCustomApiKey() {
+  const key = document.getElementById('customApiKeyInput').value.trim();
+  localStorage.setItem('zs-math-custom-groq-key', key);
+  updateCustomKeyStatus();
+}
+
+function updateCustomKeyStatus() {
+  const key = localStorage.getItem('zs-math-custom-groq-key') || '';
+  const status = document.getElementById('customKeyStatus');
+  if (!status) return;
+  if (key) {
+    status.textContent = '✅ Custom API key saved!';
+    status.style.color = 'var(--green)';
+  } else {
+    status.innerHTML = '⚠️ No key — enter one or turn off to use default.';
+    status.style.color = 'var(--red)';
+  }
+}
+
+function toggleCustomKeyVis() {
+  const inp = document.getElementById('customApiKeyInput');
+  if (inp) {
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+}
+
+function loadCustomKeySettings() {
+  const useCustom = localStorage.getItem('zs-math-use-custom-key') === 'true';
+  const key = localStorage.getItem('zs-math-custom-groq-key') || '';
+  
+  const btn = document.getElementById('togCustomKey');
+  const container = document.getElementById('customKeyContainer');
+  const inp = document.getElementById('customApiKeyInput');
+  
+  if (btn && container && inp) {
+    if (useCustom) {
+      btn.classList.add('on');
+      container.style.display = 'block';
+    } else {
+      btn.classList.remove('on');
+      container.style.display = 'none';
+    }
+    inp.value = key;
+    updateCustomKeyStatus();
+  }
+}
+
+// ── SYSTEM PROMPT (the engine) ────────────────────────────────
+function buildSystemPrompt() {
+  // Resolve subject + topic
+  const subj = SUBJECT_DATA[STATE.subject] || SUBJECT_DATA.math;
+  const topicObj = subj.topics.find(t => t.id === STATE.topic);
+  const subjectRole = subj.prompt;
+  const topicContext = topicObj ? topicObj.prompt : '';
+
+  const modeMap = {
+    'step-by-step': `${subjectRole} Solve problems methodically with clearly numbered steps. Label each step descriptively. Show ALL intermediate work. Explain the intuition behind each step. Never skip steps.`,
+    'direct': `${subjectRole} Give the direct answer with essential key steps only. State the final answer prominently. Be precise and complete, but not verbose.`,
+    'proof': `${subjectRole} Write completely formal proofs. Use correct logical structure. State all hypotheses, definitions needed, and justify EVERY inference with a named theorem, law, or principle. Match the standard of a top academic journal.`,
+    'verify': `${subjectRole} Carefully verify the given expression or solution. Check each logical step for errors. Point out any mistakes with clear explanation. If correct, confirm with a concise justification. If wrong, provide the correct solution.`,
+    'explore': `${subjectRole} Don't just solve — build deep understanding. Explain the intuition, historical context, connections to related areas, generalizations, and open problems. Make the subject come alive.`,
+    'phd': `${subjectRole} Solve at the level of a top PhD dissertation or research paper. Use the full power of modern methods. Name and apply deep theorems and seminal results. Discuss connections to current research. Format proofs and derivations rigorously.`,
+  };
+
+  const detailMap = {
+    'comprehensive': 'Be thorough. Explain every step\'s intuition. Include examples where helpful.',
+    'concise': 'Be clear and efficient. Omit only truly trivial steps.',
+    'minimal': 'Give essential steps and the final answer. No elaboration.',
+  };
+
+  const domainVal = document.getElementById('settingDomain').value;
+  const domainHint = domainVal !== 'auto'
+    ? `Domain context: ${domainVal.replace('_',' ')}. Apply domain-specific techniques and terminology.`
+    : (topicContext || 'Apply the most appropriate techniques and domain-specific methods for this problem.');
+
+  const subjectLine = topicObj
+    ? `Subject: ${subj.label} › ${topicObj.label}. ${topicContext}`
+    : `Subject: ${subj.label}.`;
+
+  const showConf = document.getElementById('togConf').classList.contains('on');
+  const citeTh = document.getElementById('togCite').classList.contains('on');
+  const showGen = document.getElementById('togGen').classList.contains('on');
+  const showOpen = document.getElementById('togOpen').classList.contains('on');
+  const autoVerify = document.getElementById('togVerify').classList.contains('on');
+
+  return `${modeMap[STATE.mode] || modeMap['step-by-step']}
+
+${subjectLine}
+${detailMap[document.getElementById('settingDetail').value] || detailMap['comprehensive']}
+${domainHint}
+
+CRITICAL FORMATTING RULES — follow exactly:
+- Use LaTeX for ALL mathematical expressions without exception
+- Inline math: $expression$ (e.g., $\\int_0^\\infty e^{-x^2}dx = \\frac{\\sqrt{\\pi}}{2}$)
+- Display math: $$expression$$ for important equations, always on their own line
+- Number steps as **Step N:** where N is the step number  
+- Use **bold** for key definitions, theorem names, and critical results
+- Mark the final answer clearly as **Final Answer:** followed by the result in display math
+- If there are multiple cases, label them: **Case 1:**, **Case 2:** etc.
+- For proofs: begin with **Proof:** and end with **□** (QED)
+- When defining terms: *Definition:* (italicized)
+${citeTh ? '- Cite the name of every theorem or lemma you apply (e.g., "By the **Hahn-Banach Theorem**...")' : ''}
+${showGen ? '- After the solution, add a **Generalization:** section noting how this extends to broader settings' : ''}
+${showOpen ? '- If relevant, briefly note any **Open Problems** connected to this topic' : ''}
+${showConf ? '- End with a **Confidence:** assessment (High/Medium/Low) and brief justification' : ''}
+${autoVerify ? '- After the main solution, add a **Verification:** section checking the answer' : ''}
+
+You have access to vision — if images of math problems are provided, carefully transcribe and solve them exactly as written. If handwriting is unclear, state your interpretation.
+
+Be mathematically precise and rigorous. Never make computational errors. Double-check your work.`;
+}
+
+// ── CAMERA ────────────────────────────────────────────────────
+let cameraStream = null;
+
+async function openCamera() {
+  const overlay = document.getElementById('cameraOverlay');
+  overlay.classList.remove('hidden');
+
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    document.getElementById('cameraVideo').srcObject = cameraStream;
+    document.getElementById('cameraHint').textContent = 'Camera active · Position math problem in frame · Tap Capture';
+  } catch(err) {
+    document.getElementById('cameraHint').textContent = 'Camera access denied. Please use the Upload button instead.';
+    document.getElementById('captureBtn').disabled = true;
+  }
+}
+
+function closeCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  document.getElementById('cameraOverlay').classList.add('hidden');
+  document.getElementById('captureBtn').disabled = false;
+  document.getElementById('cameraVideo').srcObject = null;
+}
+
+function closeCameraOnBackdrop(e) {
+  if (e.target === document.getElementById('cameraOverlay')) closeCamera();
+}
+
+function capturePhoto() {
+  const video = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('captureCanvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+  const base64 = dataUrl.split(',')[1];
+
+  STATE.pendingImages.push({ dataUrl, base64, mimeType: 'image/jpeg', source: 'camera' });
+  STATE.imagesScanned++;
+  document.getElementById('statImages').textContent = STATE.imagesScanned;
+
+  addPreviewThumb(dataUrl, STATE.pendingImages.length - 1);
+  closeCamera();
+
+  // Auto-suggest prompt
+  if (!document.getElementById('mathInput').value.trim()) {
+    document.getElementById('mathInput').value = 'Please solve this math problem shown in the image.';
+    autoResize(document.getElementById('mathInput'));
+  }
+  document.getElementById('mathInput').focus();
+}
+
+// ── IMAGE UPLOAD ──────────────────────────────────────────────
+function handleImageUpload(e) {
+  const files = Array.from(e.target.files);
+  files.forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const dataUrl = ev.target.result;
+      const base64 = dataUrl.split(',')[1];
+      STATE.pendingImages.push({ dataUrl, base64, mimeType: file.type, source: 'upload' });
+      addPreviewThumb(dataUrl, STATE.pendingImages.length - 1);
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+
+  if (!document.getElementById('mathInput').value.trim()) {
+    document.getElementById('mathInput').value = 'Please solve the math problem shown in the uploaded image.';
+    autoResize(document.getElementById('mathInput'));
+  }
+}
+
+function addPreviewThumb(dataUrl, idx) {
+  const strip = document.getElementById('previewStrip');
+  strip.style.display = 'flex';
+  const thumb = document.createElement('div');
+  thumb.className = 'preview-thumb';
+  thumb.id = `thumb-${idx}`;
+  thumb.innerHTML = `
+    <img src="${dataUrl}" alt="Math problem">
+    <button class="remove-btn" onclick="removeImage(${idx})">✕</button>`;
+  strip.appendChild(thumb);
+}
+
+function removeImage(idx) {
+  STATE.pendingImages.splice(idx, 1);
+  document.getElementById(`thumb-${idx}`)?.remove();
+  // Rebuild strip
+  const strip = document.getElementById('previewStrip');
+  if (!STATE.pendingImages.length) strip.style.display = 'none';
+}
+
+// ── SEND MESSAGE ──────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('mathInput');
+  const text = input.value.trim();
+  const hasImages = STATE.pendingImages.length > 0;
+
+  if ((!text && !hasImages) || STATE.isLoading) return;
+
+  // Hide welcome
+  document.getElementById('welcomeState')?.remove();
+
+  const sendBtn = document.getElementById('sendBtn');
+  input.value = '';
+  autoResize(input);
+  STATE.isLoading = true;
+  sendBtn.disabled = true;
+  document.getElementById('agentStatus').textContent = 'Solving…';
+
+  // Build user message content (OpenAI-compatible for Groq)
+  const msgContent = hasImages
+    ? [
+        ...STATE.pendingImages.map(img => ({ type:'image_url', image_url:{ url:`data:${img.mimeType};base64,${img.base64}` } })),
+        { type:'text', text: text || 'Please solve the math problem shown in the image(s). Show full working.' },
+      ]
+    : (text || '');
+
+  const displayText = text || '(Image of math problem)';
+  const displayImages = [...STATE.pendingImages];
+
+  // Clear pending images
+  STATE.pendingImages = [];
+  document.getElementById('previewStrip').style.display = 'none';
+  document.getElementById('previewStrip').innerHTML = '';
+
+  // Add to conversation history
+  STATE.messages.push({ role: 'user', content: msgContent });
+
+  // Render user bubble
+  appendUserMessage(displayText, displayImages);
+
+  // Detect domain for stats
+  const domain = detectDomain(displayText);
+  if (domain) {
+    STATE.domainCounts[domain.label] = (STATE.domainCounts[domain.label] || 0) + 1;
+    updateDomainStats();
+  }
+
+  const typingId = showTyping();
+  const startTime = Date.now();
+
+  try {
+    // Build OpenAI-compatible messages, stripping images from older turns
+    const messages = [
+      { role: 'system', content: buildSystemPrompt() },
+      ...STATE.messages.map((m, idx) => {
+        if (Array.isArray(m.content) && idx < STATE.messages.length - 1) {
+          const t = m.content.find(c => c.type === 'text');
+          return { role: m.role, content: t ? t.text : '[Image — earlier context]' };
+        }
+        return { role: m.role, content: m.content };
+      }),
+    ];
+    const temp = parseFloat(document.getElementById('settingTemp').value) / 100;
+    const payload = { model: GROQ_MODEL, messages, max_tokens: 8192, temperature: temp };
+
+    const useCustom = localStorage.getItem('zs-math-use-custom-key') === 'true';
+    const customKey = (localStorage.getItem('zs-math-custom-groq-key') || '').trim();
+
+    if (useCustom && !customKey) {
+      removeTyping(typingId);
+      appendError('Custom API key is enabled in Settings, but no key has been entered. Please type your Groq API key (starts with gsk_) or disable the toggle to use the free engine.');
+      document.getElementById('agentStatus').textContent = 'API key required';
+      STATE.isLoading = false; sendBtn.disabled = false; input.focus();
+      return;
+    }
+
+    let response;
+    if (useCustom && customKey) {
+      // Direct call to Groq's official completions endpoint
+      response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${customKey}`
+        },
+        body: JSON.stringify(payload),
+      });
+    } else {
+      // Call the local proxy — no API key in the browser
+      response = await fetch('/api/math', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    }
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API error ${response.status}`);
+    }
+
+    const data = await response.json();
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    removeTyping(typingId);
+
+    const assistantText = data.choices?.[0]?.message?.content || '';
+    if (!assistantText) throw new Error('Empty response from Groq. Please try again.');
+
+    STATE.messages.push({ role: 'assistant', content: assistantText });
+    appendAssistantMessage(assistantText, elapsed, displayText, domain);
+
+    STATE.solved++;
+    STATE.totalTime += parseFloat(elapsed);
+    addToHistory(displayText, domain);
+    document.getElementById('statSolved').textContent = STATE.solved;
+    document.getElementById('statTime').textContent = (STATE.totalTime / STATE.solved).toFixed(1) + 's';
+    document.getElementById('agentStatus').textContent = `Solved in ${elapsed}s · ${STATE.solved} problems this session`;
+
+  } catch(err) {
+    removeTyping(typingId);
+    let msg = err.message;
+    if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+      msg = 'Network error — check internet connection and ensure the page is served from a web server.';
+    } else if (msg.includes('401') || msg.includes('403') || msg.toLowerCase().includes('api key')) {
+      msg = 'Server API key error. Check GROQ_API_KEY in the .env file and restart the server.';
+    } else if (msg.includes('429')) {
+      msg = 'Rate limit hit. Wait a moment and try again.';
+    } else if (msg.includes('503') || msg.includes('overloaded')) {
+      msg = 'Groq is temporarily busy. Please try again in a moment.';
+    }
+    appendError(msg);
+    document.getElementById('agentStatus').textContent = 'Error — see message below';
+    console.error('Apex Math Agent:', err);
+  }
+
+  STATE.isLoading = false;
+  sendBtn.disabled = false;
+  input.focus();
+}
+
+// ── RENDER USER MESSAGE ───────────────────────────────────────
+function appendUserMessage(text, images = []) {
+  const container = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  const initials = document.getElementById('navAvatar').textContent || 'U';
+  const imagesHtml = images.map(img =>
+    `<img src="${img.dataUrl}" class="user-img-preview" alt="Problem image">`
+  ).join('');
+
+  row.innerHTML = `
+    <div class="msg-av user">${initials}</div>
+    <div class="msg-body">
+      <div class="msg-meta">${timestamp()}</div>
+      <div class="msg-bubble user-bubble">
+        ${imagesHtml}
+        ${text ? escHtml(text) : ''}
+      </div>
+    </div>`;
+  container.appendChild(row);
+  scrollBottom();
+}
+
+// ── RENDER ASSISTANT MESSAGE ──────────────────────────────────
+function appendAssistantMessage(text, elapsed, userQ, domain) {
+  const container = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'msg-row';
+  const bubbleId = 'bubble-' + Date.now();
+  const showReasoning = document.getElementById('togReasoning').classList.contains('on');
+
+  const formattedHtml = formatResponse(text);
+  const thinkHtml = showReasoning ? buildThinkBlock(text, userQ) : '';
+  const domainTag = domain
+    ? `<span class="domain-tag domain-${domain.key}">${domain.label}</span>`
+    : '';
+
+  row.innerHTML = `
+    <div class="msg-av agent">∑</div>
+    <div class="msg-body" style="max-width:90%">
+      <div class="msg-meta">
+        Apex Agent · ${timestamp()}
+        ${elapsed ? `· <span style="color:var(--green)">${elapsed}s</span>` : ''}
+        ${domainTag}
+      </div>
+      ${thinkHtml}
+      <div class="msg-bubble agent-bubble" id="${bubbleId}">${formattedHtml}</div>
+      <div class="msg-actions">
+        <button class="act-btn" onclick="copyText(this,'${escAttr(text)}')">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </button>
+        <button class="act-btn" onclick="copyLatex(this,'${escAttr(text)}')">
+          <svg viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+          Copy LaTeX
+        </button>
+        <button class="act-btn" onclick="followUp('${escAttr(userQ)}')">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Follow Up
+        </button>
+      </div>
+    </div>`;
+
+  container.appendChild(row);
+
+  // KaTeX rendering
+  if (document.getElementById('togLatex').classList.contains('on') && window.renderMathInElement) {
+    setTimeout(() => {
+      try {
+        renderMathInElement(document.getElementById(bubbleId), {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '\\(', right: '\\)', display: false },
+          ],
+          throwOnError: false,
+        });
+      } catch(e) {}
+    }, 80);
+  }
+
+  scrollBottom();
+}
+
+// ── THINKING BLOCK ────────────────────────────────────────────
+function buildThinkBlock(text, userQ) {
+  const id = 'th-' + Date.now();
+  const steps = (text.match(/\*\*Step/g) || []).length;
+  const equations = Math.floor((text.match(/\$\$/g) || []).length / 2);
+  const words = text.split(/\s+/).length;
+  const preview = userQ.substring(0, 72) + (userQ.length > 72 ? '…' : '');
+
+  return `
+    <div class="think-block">
+      <button class="think-header" id="${id}-hdr" onclick="toggleThink('${id}')">
+        <div class="think-spinner"></div>
+        <span>Agent Reasoning</span>
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.6;margin-left:4px;font-size:.68rem">${preview}</span>
+        <span class="think-chevron">›</span>
+      </button>
+      <div class="think-body" id="${id}-body">
+        <strong>Solver mode:</strong> ${STATE.mode.replace('-',' ')} ·
+        <strong>Domain:</strong> ${document.getElementById('settingDomain').value.replace('_',' ')} ·
+        <strong>Temperature:</strong> ${(parseFloat(document.getElementById('settingTemp').value)/100).toFixed(2)}
+        <br><br>
+        Solution contains <strong>${steps}</strong> explicit steps,
+        <strong>${equations}</strong> display equations,
+        and approximately <strong>${words}</strong> words.
+        <br><br>
+        <em>The agent applied ${STATE.mode === 'phd' ? 'graduate-level mathematical techniques with full rigor' :
+          STATE.mode === 'proof' ? 'formal proof structure with named theorems' :
+          STATE.mode === 'explore' ? 'expository deep-dive with connections to broader theory' :
+          'systematic step-by-step solution methodology'}.</em>
+      </div>
+    </div>`;
+}
+
+function toggleThink(id) {
+  document.getElementById(id + '-hdr').classList.toggle('open');
+  document.getElementById(id + '-body').classList.toggle('open');
+}
+
+// ── FORMAT RESPONSE ───────────────────────────────────────────
+function formatResponse(text) {
+  let h = text;
+
+  // Bold and italic
+  h = h.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  h = h.replace(/\*(?!\*)(.+?)(?<!\*)\*/g, '<em>$1</em>');
+
+  // Step labels
+  h = h.replace(/\*\*Step\s+(\d+):\*\*/g, '<strong><span class="step-num">$1</span></strong>');
+  h = h.replace(/^Step\s+(\d+):/gm, '<span class="step-num">$1</span>');
+
+  // Final answer block
+  h = h.replace(/(Final Answer:|Final Answer\s*:)/gi,
+    '<div class="answer-block"><div class="answer-label">✓ Final Answer</div>');
+  // Close answer block on double newline after
+  h = h.replace(/(<div class="answer-block">[\s\S]*?)(\n\n|\n(?=\*\*Step|\n))/,
+    '$1</div>$2');
+
+  // Proof QED
+  h = h.replace(/\s*□\s*/g, ' <span style="float:right;font-size:1.1em">□</span>');
+
+  // Code blocks
+  h = h.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+  h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Horizontal rule for sections
+  h = h.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:14px 0">');
+
+  // Paragraphs
+  h = h.replace(/\n\n/g, '</p><p style="margin:10px 0 0">');
+  h = h.replace(/\n/g, '<br>');
+
+  return `<p style="margin:0">${h}</p>`;
+}
+
+// ── DOMAIN DETECTION ──────────────────────────────────────────
+function detectDomain(text) {
+  const t = text.toLowerCase();
+  if (/\bmanifold|\btopolog|\bhomotop|\bhomeomorphi|\bfundamental group|\bfiber bundle|\bcovering space/.test(t))
+    return { key: 'topology', label: 'Topology' };
+  if (/\bcurvature|\bgeodesic|\bdifferential form|\bde rham|\blie group|\briemannian/.test(t))
+    return { key: 'analysis', label: 'Diff. Geometry' };
+  if (/\bmeasure|\blebesgue|\bborel|\bsigma.algebra|\balmost everywhere|\bintegrable/.test(t))
+    return { key: 'analysis', label: 'Measure Theory' };
+  if (/\bholomorphic|\bmeromorphic|\banalytic|\bresidue|\bcontour|\bcomplex/.test(t))
+    return { key: 'analysis', label: 'Complex Analysis' };
+  if (/\bintegral|\bderivative|\blimit|\blim\b|\bdifferential|\bconverge|\bseries/.test(t))
+    return { key: 'calculus', label: 'Analysis/Calculus' };
+  if (/\bmatrix|eigenvalue|\bdeterminant|\bvector space|\blinear map|\brank|\bnull space/.test(t))
+    return { key: 'linalg', label: 'Linear Algebra' };
+  if (/\bprobabilit|\bnormal dist|\bvariance|\bexpected value|\brandom variable|\bmarkov/.test(t))
+    return { key: 'stats', label: 'Probability' };
+  if (/\bprime|\bmodular|\bcongruence|\bgalois|\bfield extension|\bring|\bgroup theory/.test(t))
+    return { key: 'number', label: 'Abstract Algebra' };
+  if (/\bode|\bpde|\bpartial differential|\blaplacian|\bheat equation|\bwave equation/.test(t))
+    return { key: 'ode', label: 'Diff. Equations' };
+  if (/\bproof|\btheorem|\blemma|\bcorollar|\baxiom|\binduction|\bimplication/.test(t))
+    return { key: 'number', label: 'Proof / Logic' };
+  if (/\bsolve|\bequation|\bfactor|\bquadratic|\bpolynomial/.test(t))
+    return { key: 'algebra', label: 'Algebra' };
+  if (/\bangle|\btriangle|\bcircle|\bgeometr/.test(t))
+    return { key: 'geometry', label: 'Geometry' };
+  return null;
+}
+
+function updateDomainStats() {
+  const el = document.getElementById('domainStats');
+  const entries = Object.entries(STATE.domainCounts).sort((a,b) => b[1]-a[1]);
+  if (!entries.length) {
+    el.innerHTML = '<div style="font-size:.72rem;color:var(--ink-4);font-family:var(--font)">No problems solved yet</div>';
+    return;
+  }
+  el.innerHTML = entries.map(([label, count]) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;font-size:.74rem;font-family:var(--font);color:var(--ink-2)">
+      <span>${label}</span>
+      <span style="color:var(--accent-2);font-weight:700;font-family:var(--mono)">${count}</span>
+    </div>`).join('');
+}
+
+// ── TYPING INDICATOR ──────────────────────────────────────────
+function showTyping() {
+  const id = 'typing-' + Date.now();
+  const container = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'msg-row';
+  row.id = id;
+  row.innerHTML = `
+    <div class="msg-av agent">∑</div>
+    <div class="msg-body">
+      <div class="typing-wrap">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <span class="typing-label">Solving…</span>
+      </div>
+    </div>`;
+  container.appendChild(row);
+  scrollBottom();
+  return id;
+}
+function removeTyping(id) { document.getElementById(id)?.remove(); }
+
+function appendError(msg) {
+  const container = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'msg-row';
+  row.innerHTML = `
+    <div class="msg-av agent">∑</div>
+    <div class="msg-body">
+      <div class="err-bubble">
+        <strong>Error:</strong> ${escHtml(msg)}<br>
+        <span style="font-size:.75rem;opacity:.8">The page must be served from a web server. If running locally, try: <code>npx serve .</code></span>
+      </div>
+    </div>`;
+  container.appendChild(row);
+  scrollBottom();
+}
+
+// ── HISTORY ───────────────────────────────────────────────────
+function addToHistory(question, domain) {
+  STATE.history.unshift({ q: question, domain: domain?.label, ts: Date.now() });
+  if (STATE.history.length > 30) STATE.history.pop();
+  saveHistory();
+  renderHistList();
+}
+
+function renderHistList() {
+  const el = document.getElementById('histList');
+  if (!STATE.history.length) {
+    el.innerHTML = '<div style="font-size:.72rem;color:var(--ink-4);padding:4px 10px;font-family:var(--font)">No history yet</div>';
+    return;
+  }
+  el.innerHTML = STATE.history.slice(0, 12).map((h, i) => `
+    <button class="hist-item" onclick="reuseQuestion(${i})" title="${escHtml(h.q)}">
+      ${h.domain ? `<span class="hist-item-domain">${h.domain}</span>` : ''}
+      ${escHtml(h.q.substring(0, 34))}${h.q.length > 34 ? '…' : ''}
+    </button>`).join('');
+}
+
+function reuseQuestion(i) {
+  const h = STATE.history[i];
+  if (!h) return;
+  document.getElementById('mathInput').value = h.q;
+  autoResize(document.getElementById('mathInput'));
+  document.getElementById('mathInput').focus();
+  const popover = document.getElementById('historyPopover');
+  if (popover) popover.classList.remove('show');
+}
+
+function toggleHistoryPopover(e) {
+  if (e) e.stopPropagation();
+  const popover = document.getElementById('historyPopover');
+  if (popover) popover.classList.toggle('show');
+}
+
+document.addEventListener('click', e => {
+  const popover = document.getElementById('historyPopover');
+  const btn = document.getElementById('historyBtn');
+  if (popover && popover.classList.contains('show')) {
+    if (!popover.contains(e.target) && (!btn || !btn.contains(e.target))) {
+      popover.classList.remove('show');
+    }
+  }
+});
+
+function saveHistory() {
+  try { localStorage.setItem('zs-math-hist-v2', JSON.stringify(STATE.history)); } catch(e) {}
+}
+function loadHistory() {
+  try {
+    const saved = localStorage.getItem('zs-math-hist-v2');
+    if (saved) STATE.history = JSON.parse(saved);
+    renderHistList();
+  } catch(e) {}
+}
+
+function clearAll() {
+  STATE.history = [];
+  saveHistory();
+  renderHistList();
+  clearChat();
+}
+
+function clearChat() {
+  STATE.messages = [];
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = `
+    <div class="welcome-state" id="welcomeState">
+      <div class="welcome-orb">∑</div>
+      <h2>Zen<em>lab</em></h2>
+      <p>PhD-level mathematics powered by Llama 3.3. Handles everything from undergraduate calculus to graduate-level real analysis, algebraic topology, measure theory, abstract algebra, and beyond. Now with vision — scan or photograph any problem.</p>
+      <div class="capability-pills">
+        <span class="cap-pill">∫ Analysis</span>
+        <span class="cap-pill">∑ Algebra</span>
+        <span class="cap-pill">⊗ Linear Algebra</span>
+        <span class="cap-pill">σ Probability</span>
+        <span class="cap-pill">∂ PDEs / ODEs</span>
+        <span class="cap-pill">ℕ Number Theory</span>
+        <span class="cap-pill">⌂ Topology</span>
+        <span class="cap-pill">∇ Differential Geometry</span>
+        <span class="cap-pill">∀ Logic & Proofs</span>
+        <span class="cap-pill">∞ Measure Theory</span>
+        <span class="cap-pill">📸 Vision OCR</span>
+      </div>
+    </div>`;
+  document.getElementById('agentStatus').textContent = 'PhD-level solver · Vision enabled · Step-by-step reasoning';
+}
+
+// ── FOLLOW UP ─────────────────────────────────────────────────
+function followUp(originalQ) {
+  const input = document.getElementById('mathInput');
+  input.value = `Regarding the previous problem: `;
+  autoResize(input);
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+
+// ── DOWNLOAD ──────────────────────────────────────────────────
+function downloadChat() {
+  const lines = STATE.messages.map(m => {
+    const content = Array.isArray(m.content)
+      ? m.content.filter(b => b.type === 'text').map(b => b.text).join('\n')
+      : m.content;
+    return `[${m.role.toUpperCase()}]\n${content}\n`;
+  }).join('\n─────────────────────\n\n');
+  const blob = new Blob([lines], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `apex-math-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── COPY ──────────────────────────────────────────────────────
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy`; }, 1500);
+  });
+}
+function copyLatex(btn, text) {
+  const matches = text.match(/\$\$[\s\S]*?\$\$|\$[^$]*?\$/g) || [];
+  navigator.clipboard.writeText(matches.join('\n') || text).then(() => {
+    btn.textContent = '✓ LaTeX Copied';
+    setTimeout(() => { btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg> Copy LaTeX`; }, 1500);
+  });
+}
+
+// ── LATEX HELPER ──────────────────────────────────────────────
+function toggleLatexHelper() {
+  const input = document.getElementById('mathInput');
+  const current = input.value;
+  if (!current.includes('$')) {
+    input.value = current + ' $';
+    input.focus();
+  }
+}
+
+// ── UTILITIES ─────────────────────────────────────────────────
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+
+function scrollBottom() {
+  const c = document.getElementById('chatMessages');
+  requestAnimationFrame(() => { c.scrollTop = c.scrollHeight; });
+}
+
+function timestamp() {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function escAttr(s) {
+  return String(s).replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/'/g,"\\'").replace(/\$/g,'\\$');
+}
+
+// Hide navbar and maximize layout if loaded in iframe
+if (window.self !== window.top) {
+  const navEl = document.querySelector('.nav');
+  if (navEl) navEl.style.display = 'none';
+  const layoutEl = document.querySelector('.layout');
+  if (layoutEl) layoutEl.style.height = '100dvh';
+}
+</script>
+</body>
+</html>
